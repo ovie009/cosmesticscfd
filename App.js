@@ -7,17 +7,12 @@ import { useFonts } from 'expo-font';
 // gesture handler
 import 'react-native-gesture-handler'; //required import for bottomsheet to function
 // react native components
-import { SafeAreaView, StatusBar, AppRegistry, Text } from 'react-native';
+import { SafeAreaView, StatusBar, AppRegistry } from 'react-native';
 // navigation paramters
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-// stacks
-import Home from './stacks/Home';
-import Checkout from './stacks/Checkout';
-import Favorites from './stacks/Favorites';
-import Survey from './stacks/Survery';
-import Search from './stacks/Search';
-import Product from './stacks/Product';
+// routes
+import Routes from './router/Routes';
 // bottom sheet components
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -25,6 +20,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomNavigation from './components/BottomNavigation';
 // conetxt
 import AppProvider from './context/AppContext';
+import AuthProvider from './context/AuthContext';
+import { colors } from './styles/colors';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -49,39 +46,26 @@ export default function App() {
 		}
 	}, [fontsLoaded]);
 
-	// stack wrapper
-	const Stack = createNativeStackNavigator();
-
 	// if fonts has not loaded
 	if (!fontsLoaded) return null
 
 	return (
 		<SafeAreaView style={{flex: 1}} onLayout={onLayoutRootView}>
 			<NavigationContainer>
-				<AppProvider>
-					<GestureHandlerRootView style={{ flex: 1 }}>
-						<BottomSheetModalProvider>
-							<StatusBar 
-								style="dark" 
-								backgroundColor={'#fff'}
-							/>
-							<Stack.Navigator
-								initialRouteName='Home'
-								screenOptions={{
-									headerShown: false
-								}}
-							>
-								<Stack.Screen name="Home" component={Home} />
-								<Stack.Screen name="Checkout" component={Checkout} />
-								<Stack.Screen name="Favorites" component={Favorites} />
-								<Stack.Screen name="Product" component={Product} />
-								<Stack.Screen name="Search" component={Search} />
-								<Stack.Screen name="Survey" component={Survey} />
-							</Stack.Navigator>
-							<BottomNavigation />
-						</BottomSheetModalProvider>
-					</GestureHandlerRootView>
-				</AppProvider>
+				<AuthProvider>
+					<AppProvider>
+						<GestureHandlerRootView style={{ flex: 1 }}>
+							<BottomSheetModalProvider>
+								<StatusBar 
+									style="dark" 
+									backgroundColor={colors.background}
+								/>
+								<Routes />
+								<BottomNavigation />
+							</BottomSheetModalProvider>
+						</GestureHandlerRootView>
+					</AppProvider>
+				</AuthProvider>
 			</NavigationContainer>
 		</SafeAreaView>
 	);

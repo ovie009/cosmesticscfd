@@ -1,20 +1,36 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native'
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { colors } from '../styles/colors'
 import { Image } from 'expo-image';
 // shadow component
 import { Shadow } from 'react-native-shadow-2';
-// data
-import { skincareProducts } from '../data/skincareProducts';
-import { makeupProducts } from '../data/makeupProducts';
-import { hairProducts } from '../data/hairProducts';
-import { fragranceProducts } from '../data/fragranceProducts';
-import { personalCareProducts } from '../data/personalCareProducts';
 // icons
 import CartIcon from '../assets/svg/CartIcon';
 import MenuIcon from '../assets/svg/MenuIcon';
 
+// skeletons screen
+import HomeSkeleton from '../skeleton/HomeSkeleton';
+
+// firebase
+import {
+    database,
+} from "../Firebase";
+
+// firestore functions
+import {
+    addDoc,
+    collection,
+    getDocs,
+    where,
+    query,
+    orderBy,
+    serverTimestamp,
+} from "firebase/firestore";
+
 const Home = ({navigation}) => {
+
+    // page loading
+    const [pageLoading, setPageLoading] = useState(true);
 
     // tabs for cosmetics categories
     const [tabs, setTabs] = useState([
@@ -25,17 +41,51 @@ const Home = ({navigation}) => {
         {title: 'Personal Care', active: false},
     ]);
 
-    // products data
-    const products = useMemo(() => {
-        const activeTabs = tabs.find(tab => tab.active);``
-        if (activeTabs.title === 'Skincare') return skincareProducts;
-        if (activeTabs.title === 'Makeup') return makeupProducts;
-        if (activeTabs.title === 'Haircare') return hairProducts;
-        if (activeTabs.title === 'Fragrance') return fragranceProducts;
-        if (activeTabs.title === 'Personal Care') return personalCareProducts;
-        return []
-    }, [tabs])
+    const [products, setProducts] = useState([]);
 
+    // products data
+    const tabProducts = useMemo(() => {
+        const activeTabs = tabs.find(tab => tab.active);
+        if (activeTabs.title === 'Skincare') {
+            return products.filter(product => product.cateory === 'Skincare');
+        } 
+        if (activeTabs.title === 'Makeup') {
+            return products.filter(product => product.cateory === 'Makeup');
+        } 
+        if (activeTabs.title === 'Haircare') {
+            return products.filter(product => product.cateory === 'Haircare');
+        } 
+        if (activeTabs.title === 'Fragrance') {
+            return products.filter(product => product.cateory === 'Fragrance');
+        } 
+        if (activeTabs.title === 'Personal Care') {
+            return products.filter(product => product.cateory === 'Personal Care');
+        } 
+        return []
+    }, [tabs, products])
+
+    useEffect(() => {
+        // fetch producs from database
+        const fetchProducts = async () => {
+            try {
+                const productsRef = collection(database, "products");
+                const q = query(productsRef, orderBy("product_name"));
+                const querySnapshot = await getDocs(q);
+                const products = [];
+                querySnapshot.forEach((doc) => {
+                    products.push({...doc.data(), id: doc.id});
+                });
+                setProducts(products);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setPageLoading(false);
+            }
+        }
+
+        fetchProducts();
+
+    }, [tabs]);
 
     // handle seected tab
     const handleSelectedTab = (tabSelected) => {
@@ -49,7 +99,54 @@ const Home = ({navigation}) => {
         })
     }
 
-    return (
+    // const uploadData = async () => {
+    //     try {
+    //         console.log('uploading data...');
+    //         // ref to products collection
+    //         const productsRef = collection(database, "products");
+
+    //         const products = [
+    //             ...skincareProducts,
+    //             ...makeupProducts,
+    //             ...hairProducts,
+    //             ...fragranceProducts,
+    //             ...personalCareProducts
+    //         ];
+
+    //         products.forEach(async (product) => {
+    //             try {
+
+    //                 // check if product name exist, if it does then skip
+    //                 const q = query(productsRef, where("product_name", "==", product.name));
+
+    //                 // get docs
+    //                 const querySnapshot = await getDocs(q);
+
+    //                 if (querySnapshot.size > 0) {
+    //                     console.log("Data", querySnapshot.docs[0].data())
+    //                     console.log("Document already exists");
+    //                     return;
+    //                 }
+
+    //                 // add doc
+    //                 await addDoc(productsRef, {
+    //                     product_name: product.name,
+    //                     price: product.price,
+    //                     cateory: product.category,
+    //                     created_at: serverTimestamp(),
+    //                     edited_at: serverTimestamp(),
+    //                 });
+
+    //             } catch (error) {
+    //                 console.log("Error adding document: ", error.messsage);
+    //             }
+    //         })
+    //     } catch (error) {
+    //         console.log("Erorr creating collection: ", error.messsage);
+    //     }
+    // }
+
+    return !pageLoading ? (
         <ScrollView style={styles.container}>
             {/* header cions wrapper */}
             <View style={styles.header}>
@@ -88,7 +185,10 @@ const Home = ({navigation}) => {
                 ))}
             </ScrollView>
             <View style={styles.productListHeading}>
-                <TouchableOpacity style={styles.productListHeadingButton}>
+                <TouchableOpacity 
+                    style={styles.productListHeadingButton}
+                    onPress={() => uploadData()}
+                >
                     <Text style={styles.productListHeadingText}>see more</Text>
                 </TouchableOpacity>
             </View>
@@ -97,14 +197,15 @@ const Home = ({navigation}) => {
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
             >
-                {products.map((product, index) => (
+                {tabProducts.map((product) => (
                     <TouchableOpacity
-                        key={product.name + index}
+                        key={product.id}
                         style={styles.productCard}
                         onPress={() => navigation.navigate("Product", {
-                            product_name: product.name,
+                            product_id: product.id,
+                            product_name: product.product_name,
                             product_price: product.price, 
-                            product_image: product.image, 
+                            product_image: product.product_image, 
                         })}
                     >
                         <Shadow 
@@ -114,13 +215,13 @@ const Home = ({navigation}) => {
                             startColor='#00000012'
                         >
                             <Image 
-                                source={product.image}
+                                source={{uri: product.product_image}}
                                 style={styles.productImage}
                             />
                         </Shadow>
                         <View style={styles.productTextWrapper}>
                             <Text style={styles.productName} numberOfLines={2} ellipsizeMode='tail'>
-                                {product.name}
+                                {product.product_name}
                             </Text>
                             <Text style={styles.productPrice}>
                                 ₦{product.price.toLocaleString()}
@@ -130,6 +231,8 @@ const Home = ({navigation}) => {
                 ))}
             </ScrollView>
         </ScrollView>
+    ) : (
+        <HomeSkeleton />
     )
 }
 

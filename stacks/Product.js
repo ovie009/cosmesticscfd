@@ -12,7 +12,7 @@ import BackArrowIcon from '../assets/svg/BackArrowIcon';
 const Product = ({navigation, route}) => {
 
     // destruct route paramters
-    const {product_name, product_price, product_image} = useMemo(() => {
+    const {product_id, product_name, product_price, product_image} = useMemo(() => {
         return route?.params || {}
     }, [route?.params]);
 
@@ -75,7 +75,8 @@ const Product = ({navigation, route}) => {
                 <TouchableOpacity
                     style={styles.actionButton}
                     onPress={() => navigation.navigate('Survey', {
-                        product_name: product_name
+                        product_id: product_id,
+                        product_name: product_name,
                     })}
                 >
                     <Text style={styles.actionButtonText}>Take Survey</Text>

@@ -8,4 +8,5 @@ export const colors = {
     indicator: '#C4C4C4',
     radio: '#9F9F9F',
     listSeperaor: 'rgba(0, 0, 0, 0.3)',
+    secondary: '#FF470B',
 }
