@@ -18,6 +18,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 // components
 import BottomNavigation from './components/BottomNavigation';
+import Taskbar from './components/Taskbar';
 // conetxt
 import AppProvider from './context/AppContext';
 import AuthProvider from './context/AuthContext';
@@ -35,6 +36,7 @@ export default function App() {
 		'sf-pro-rounded-bold': require('./assets/fonts/SF-Pro-Rounded-Bold.ttf'),
 		'sf-pro-text-regular': require('./assets/fonts/SF-Pro-Text-Regular.ttf'),
 		'sf-pro-text-semibold': require('./assets/fonts/SF-Pro-Text-Semibold.ttf'),
+		'poppins-semibold': require('./assets/fonts/Poppins-SemiBold.ttf'),
 	});
 
 	//   function to load font
@@ -56,10 +58,7 @@ export default function App() {
 					<AppProvider>
 						<GestureHandlerRootView style={{ flex: 1 }}>
 							<BottomSheetModalProvider>
-								<StatusBar 
-									style="dark" 
-									backgroundColor={colors.background}
-								/>
+								<Taskbar />
 								<Routes />
 								<BottomNavigation />
 							</BottomSheetModalProvider>

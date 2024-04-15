@@ -12,27 +12,40 @@ import Favorites from '../stacks/Favorites';
 import Survey from '../stacks/Survery';
 import Search from '../stacks/Search';
 import Product from '../stacks/Product';
+import Login from '../stacks/Login';
+import Analytics from '../stacks/Analytics';
+
 
 const Routes = () => {
 
     const { authData } = useAuth();  // auth data
 
+    console.log(authData);
     // stack components
     const Stack = createNativeStackNavigator();
 
     return (
         <Stack.Navigator
-            initialRouteName='Home'
+            initialRouteName={authData ? 'Analytics' : 'Home'}
             screenOptions={{
                 headerShown: false
             }}
         >
-            <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen name="Checkout" component={Checkout} />
-            <Stack.Screen name="Favorites" component={Favorites} />
-            <Stack.Screen name="Product" component={Product} />
-            <Stack.Screen name="Search" component={Search} />
-            <Stack.Screen name="Survey" component={Survey} />
+            {authData ? (
+                <Stack.Group>
+                    <Stack.Screen name="Analytics" component={Analytics} />
+                </Stack.Group>
+            ) : (
+                <Stack.Group>
+                    <Stack.Screen name="Home" component={Home} />
+                    <Stack.Screen name="Checkout" component={Checkout} />
+                    <Stack.Screen name="Favorites" component={Favorites} />
+                    <Stack.Screen name="Product" component={Product} />
+                    <Stack.Screen name="Search" component={Search} />
+                    <Stack.Screen name="Survey" component={Survey} />
+                    <Stack.Screen name="Login" component={Login} />
+                </Stack.Group>
+            )}
         </Stack.Navigator>
     )
 }

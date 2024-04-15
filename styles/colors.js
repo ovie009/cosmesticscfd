@@ -7,6 +7,7 @@ export const colors = {
     neutral: '#9A9A9D',
     indicator: '#C4C4C4',
     radio: '#9F9F9F',
-    listSeperaor: 'rgba(0, 0, 0, 0.3)',
+    listSeperator: 'rgba(0, 0, 0, 0.3)',
+    listSeperatorLight: '#F4F4F8',
     secondary: '#FF470B',
 }

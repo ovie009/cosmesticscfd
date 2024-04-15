@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Dimensions } from 'react-native'
-import React, { useMemo, useRef, useState, useCallback } from 'react'
+import React, { useMemo, useRef, useState, useCallback, useEffect } from 'react'
 // icons
 import BackArrowIcon from '../assets/svg/BackArrowIcon';
 import { colors } from '../styles/colors';
@@ -219,8 +219,8 @@ const Survey = ({navigation, route}) => {
 			const surveysRef = collection(database, "surveys");
 
 			await addDoc(surveysRef, {
-				full_name: "John Doe",
-				email: "johndoe@gamil.com",
+				full_name: "Okoye Promise",
+				email: "promise4engr@gmail.com",
 				product_id: product_id,
 				data: data,
 				created_at: serverTimestamp(),
@@ -279,6 +279,8 @@ const Survey = ({navigation, route}) => {
 		// close bottomsheet
 		bottomSheetRef.current?.close();
 	}
+	// console.log(generateRandomAnswers());
+	
 
     return (<>
 		{/* mai page content */}
@@ -476,7 +478,7 @@ const styles = StyleSheet.create({
 	},
 	listSeperator: {
 		borderBottomWidth: 0.5,
-		borderBottomColor: colors.listSeperaor,
+		borderBottomColor: colors.listSeperator,
 	},
 	actionButtonWrapper: {
         width: '100%',

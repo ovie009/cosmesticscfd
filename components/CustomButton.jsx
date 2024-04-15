@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Animated, Easing } from 'reac
 import React, {useEffect, useRef} from 'react'
 import { colors } from '../styles/colors'
 
-const CustomButton = ({onPress, disabled, inactive, isLoading, text}) => {
+const CustomButton = ({onPress, disabled, isLoading, text}) => {
 
     const translate1 = useRef(new Animated.Value(0)).current;
     const translate2 = useRef(new Animated.Value(0)).current;
@@ -71,7 +71,7 @@ const CustomButton = ({onPress, disabled, inactive, isLoading, text}) => {
     // handle on press function
     const handleOnPress = () => {
         if (isLoading) return () => {};
-        if (inactive) return () => {};
+        if (disabled) return () => {};
         return onPress();
     }
 

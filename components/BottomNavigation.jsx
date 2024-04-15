@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, TouchableOpacity } from 'react-native'
 import React from 'react';
 // icons
 import HomeIcon from '../assets/svg/HomeIcon';
@@ -17,13 +17,19 @@ const BottomNavigation = () => {
     const navigation = useNavigation();
 
     // get current stact
-    const { currentStack } = useGlobals();
+    const { currentStack, sideNavOpen } = useGlobals();
+
+    if (sideNavOpen) return <></>;
 
     // stacks to show navigation
     const visibleStacks = ["Home", "Favorites", "Search"];
 
     return visibleStacks.includes(currentStack) ?  (
-        <View style={styles.container}>
+        <View 
+            style={[
+                styles.container,
+            ]}
+        >
             <TouchableOpacity
                 onPress={() => navigation.navigate('Home')}
             >
@@ -51,10 +57,12 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         width: '100%',
+        paddingTop: 20,
         paddingBottom: 50,
         display: 'flex',
         justifyContent: 'space-evenly',
         alignItems: 'flex-end',
         flexDirection: 'row',
+        zIndex: 9,
     }
 })
