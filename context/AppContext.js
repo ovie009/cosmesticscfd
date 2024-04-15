@@ -19,7 +19,7 @@ const AppProvider = ({children}) => {
     useEffect(() => {
         const unsubscribe = navigation.addListener('state', () => {
             // update currentStack
-            setCurrentStack(navigation.getCurrentRoute().name);
+            setCurrentStack(navigation.getCurrentRoute()?.name);
 
             // close side navigation
             setSideNavOpen(false);

@@ -10,4 +10,12 @@ export const colors = {
     listSeperator: 'rgba(0, 0, 0, 0.3)',
     listSeperatorLight: '#F4F4F8',
     secondary: '#FF470B',
+    accent: '#F47B0A',
+    pieChart: [
+        '#FF5F5D',
+        '#3F7C85',
+        '#00CCBF',
+        '#72F2EB',
+        '#747E7E',
+    ]
 }

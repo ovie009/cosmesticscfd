@@ -114,7 +114,7 @@ const Home = ({navigation}) => {
 
         fetchProducts();
 
-    }, [tabs]);
+    }, []);
 
     // handle seected tab
     const handleSelectedTab = (tabSelected) => {

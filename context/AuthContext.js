@@ -25,6 +25,9 @@ const AuthProvider = ({children}) => {
 	// auth data state
 	const [authData, setAuthData] = useState(null);
 
+	// auth loading
+	const [authLoading, setAuthLoading] = useState(true);
+
 	// auth listeners
 	useEffect(() => {
 		// detect changes in auth state
@@ -32,12 +35,15 @@ const AuthProvider = ({children}) => {
 			try {
 				// console.log("Auth State Changed", user);
 				if (!user) {
-					return setAuthData(null);
+					setAuthData(null);
 				}
                 
                 setAuthData(user);
 			} catch (error) {
 				console.error("auth change arror", error.message);
+			} finally {
+				// disable auth loading
+				setAuthLoading(false);
 			}
 		})
 
@@ -47,7 +53,7 @@ const AuthProvider = ({children}) => {
 	}, []);
 
 	return (
-		<AuthContext.Provider value={{authData}}>
+		<AuthContext.Provider value={{authData, authLoading}}>
 			{children}
 		</AuthContext.Provider>
 	)

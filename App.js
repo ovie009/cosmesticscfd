@@ -22,7 +22,6 @@ import Taskbar from './components/Taskbar';
 // conetxt
 import AppProvider from './context/AppContext';
 import AuthProvider from './context/AuthContext';
-import { colors } from './styles/colors';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
