@@ -247,9 +247,38 @@ const Dashboard = ({navigation}) => {
             }
         }
 
+        // fetch producs from database
+        const fetchQuestions = async () => {
+            try {
+                const productsRef = collection(database, "survey_questions");
+                const q = query(productsRef, orderBy("serial_number"));
+                const querySnapshot = await getDocs(q);
+                const products = [];
+                querySnapshot.forEach((doc) => {
+                    products.push({...doc.data(), id: doc.id});
+                });
+                setSurveyQuestions(products);
+            } catch (error) {
+                console.log(error);
+            } 
+        }
+
+        
+        fetchQuestions().catch(error => console.log(error));
         fetchProducts().catch(error => console.log(error));
         fetchSurveys().catch(error => console.log(error));
     }, [tabs]);
+
+    
+    const getProduct = useCallback((productId) => {
+        const selectedProduct = products.find(product => product.id === productId);
+        return selectedProduct;
+    }, [products])
+
+    const getProductSurvey = useCallback((productId) => {
+        const productSurvey = surveys.filter(survey => survey.product_id === productId);
+        return productSurvey;
+    }, [surveys])
 
 
     const handleNavigateToAnalytics = (productId) => {
@@ -324,7 +353,13 @@ const Dashboard = ({navigation}) => {
                     <TouchableOpacity 
                         key={product.id} 
                         style={styles.productWrapper}
-                        onPress={() => handleNavigateToAnalytics(product.id)}
+                        onPress={() => {
+                            navigation.navigate("Analytics", {
+                                product_survey: getProductSurvey(product.id),
+                                selected_product: getProduct(product.id),
+                                survey_questions: surveyQuestions
+                            })
+                        }}
                     >
                         <Shadow 
                             style={styles.optionsWrapper}

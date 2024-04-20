@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Dimensions } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 // icons
+import CloseIcon from '../assets/svg/CloseIcon';
 import BackArrowIcon from '../assets/svg/BackArrowIcon';
 import { colors } from '../styles/colors';
 // shadow
@@ -24,7 +25,16 @@ import {
     query,
     collection,
 } from "firebase/firestore";
+import { Image } from 'expo-image';
+// bottomsheet component
+import {
+    BottomSheetModal,
+    BottomSheetBackdrop,
+    BottomSheetScrollView
+} from "@gorhom/bottom-sheet";
 
+// components
+import ModalHandle from '../components/ModalHandle';
 
 
 // window width
@@ -33,121 +43,86 @@ const windowWidth = Dimensions.get("window").width;
 const Analytics = ({navigation, route}) => {
 
 	// destruct route paramters
-	const {product_survey, selected_product} = route?.params || {};
+	const {product_survey, selected_product, survey_questions} = route?.params || {};
 	
 	// survey questions
-	const [surveyQuestions, setSurveyQuestions] = useState([
-		{
-			id: 'qRzwquEGnJB503WnpIK9',
-			question: 'Have you used this product before?',
-			options: [
-				{text: 'Yes', value: 1},
-				{text: 'No', value: 0},
-			],
-			answer: null,
-		},
-		{
-			id: 'yqkgJiwS6Gz4pzEOqH8P',
-			question: 'What factors influence your decision to purchase this product?',
-			options: [
-				{text: 'Price', value: 1},
-				{text: 'Ingredients', value: 2},
-				{text: 'Brand Reputation', value: 3},
-				{text: 'Products Reviews', value: 4},
-			],
-			answer: null,
-		},
-		{
-			id: 'slWnymirA3Z4VQEHj3BI',
-			question: 'How often are you likely to buy this product?',
-			options: [
-				{text: 'Weekly', value: 1},
-				{text: 'Monthly', value: 2},
-				{text: 'Bi-Monthly', value: 3},
-				{text: 'Occassionally', value: 4},
-			],
-			answer: null,
-		},
-		{
-			id: 't3PUQ5Z5YGpjU3Iv29rc',
-			question: 'What specific skin concerns or needs do you look to address?',
-			options: [
-				{text: 'Dryness', value: 1},
-				{text: 'Sensitivity', value: 2},
-				{text: 'Aging', value: 3},
-				{text: 'Uneven Skin Tone', value: 4},
-			],
-			answer: null,
-		},
-		{
-			id: 'ZTlzJyeWQtWIh6DBFxCr',
-			question: 'Would you recommend this product to your family or friends?',
-			options: [
-				{text: 'Strongly Agree', value: 1},
-				{text: 'Agree', value: 2},
-				{text: 'Disagree', value: 3},
-				{text: 'Strongly Disagree', value: 4},
-			],
-			answer: null,
-		},
-		{
-			id: 'V1jPI3OtJR72mekbHGFJ',
-			question: 'How satisfied are you with this product?',
-			options: [
-				{text: 'Very Satisfied', value: 1},
-				{text: 'Somewhat Satisfied', value: 2},
-				{text: 'Neutral', value: 3},
-				{text: 'Dissatisfied', value: 4},
-			],
-			answer: null,
-		},
-		{
-			id: 'D2pLIevZ2MjDqoCXKwFb',
-			question: 'Are you willing to pay more for similar products with more organic or natural ingredients?',
-			options: [
-				{text: 'Yes, significantly more', value: 1},
-				{text: 'Yes, slightly more', value: 2},
-				{text: 'No, not willing to pay more', value: 3},
-				{text: 'No preference', value: 4},
-			],
-			answer: null,
-		},
-		{
-			id: 'rkENGpEIY8OjfuZjHp6H',
-			question: 'Have you ever switched brands or tried a new product? If so, what motivated this change?',
-			options: [
-				{text: 'Price', value: 1},
-				{text: 'Ingredient Preference', value: 2},
-				{text: 'Recommendation from friend/family', value: 3},
-				{text: 'Advertisement/marketing campaign', value: 4},
-			],
-			answer: null,
-		},
-		{
-			id: 'HE8ksoiocQPl32WL5sno',
-			question: 'Do you think the price of this product is worth the quality of the product?',
-			options: [
-				{text: 'Strongly Agree', value: 1},
-				{text: 'Agree', value: 2},
-				{text: 'Maybe', value: 3},
-				{text: 'Never', value: 4},
-			],
-			answer: null,
-		},
-	]);
+	const [surveyQuestions, setSurveyQuestions] = useState(survey_questions);
 
-    // handle sign out function
-    const handleSignOut = async () => {
-        try {
-            await signOut(auth)
-        } catch (error) {
-            console.log(error.message);
-        }
+    // bottomsheet ref
+    const bottomSheetScreenRef = useRef(null);
+
+    // question list in select question bottomsheet
+    const [questionList, setQuestionList] = useState(survey_questions);
+
+
+    // set updating question number
+    const [questionNumber, setQuestionNumber] = useState(1);
+
+    // open bottom sheet modal
+    const openModal = (questionNumber) => {
+        // update question number
+        setQuestionNumber(questionNumber);
+        // open sheet
+        bottomSheetScreenRef.current?.present();
+    }
+    
+    // close bottom sheet modal
+    const closeModal = () => {
+        // close sheet
+        bottomSheetScreenRef.current?.close();
     }
 
+    // render popup bottomsheet modal backdrop 
+    const renderBackdrop = useCallback(
+        props => (
+            <BottomSheetBackdrop
+                {...props}
+                disappearsOnIndex={-1}
+                appearsOnIndex={0}
+                opacity={0.3}
+                // onPress={bottomSheetParameters.closeModal}
+            />
+        ),
+        []
+    );
+
+    const handleOpenSheetStates = (index) => {
+        // if sheet is closed
+        if (index === -1) {
+            // close modal
+            closeModal();
+        }
+    }
+    
 
     const [surveys, setSurveys] = useState(product_survey);
 
+    // retunr only unique full_name and email address
+    const participants = [...new Set(product_survey.map(survey => `${survey.full_name}::${survey.email}`))].map(participant => {
+        const [full_name, email] = participant.split('::');
+        return {
+            full_name,
+            email,
+        };
+    });
+
+    // question 1
+    const [question1, setQuestion1] = useState(survey_questions[1])
+    
+    // question 2
+    const [question2, setQuestion2] = useState(survey_questions[6])
+
+    // select question function
+    const handleSelectQuestion = (questionId) => {
+
+        if (questionNumber === 1) {
+            setQuestion1(surveyQuestions.find(question => question.id === questionId))
+            return closeModal();
+        }
+        
+        setQuestion2(surveyQuestions.find(question => question.id === questionId))
+        return closeModal();
+    }
 
 	const handleSelectedOption = (questionId, answerValue) => {
 		setSurveyQuestions(prevSurveyQuestions => {
@@ -162,11 +137,125 @@ const Analytics = ({navigation, route}) => {
 			})
 		})
 	}
-    // const dataTest = survey.filter(item => item.data.filter(i => i.questionId === 'qRzwquEGnJB503WnpIK9'));
 
-    
+    const chiSquareTest = (question1, question2) => {
+        
+        // question 1 options
+        const question1options = surveyQuestions
+            .find(question => question.id === question1)
+            .options.map(option => option.text);
+
+        // question 2 options
+        const question2options = surveyQuestions
+            .find(question => question.id === question2)
+            .options.map(option => option.text);
+
+        // get all data
+        const participantsSurveys = surveys.map(survey => {
+            return {survey: survey.data}
+        });
+
+        const contigencyTable = question1options.flatMap(q1 => {
+            return question2options.map(q2 => {
+                const count = participantsSurveys
+                    .filter(surveys => {
+                        // console
+                        const firstCriteria = surveys.survey.find(survey => survey.questionId === question1 && survey.answer.text === q1);
+                        // console.log(firstCriteria);
+                        const secondCriteria = surveys.survey.find(survey => survey.questionId === question2 && survey.answer.text === q2);
+                        // console.log(secondCriteria);
+
+                        return ![firstCriteria, secondCriteria].includes(undefined);
+                }).length
+                
+                return {
+                    q1,
+                    q2,
+                    count
+                }
+            })
+        });
+
+        // total for reach row
+        const totalRows = question1options.map(q1 => {
+            const row = contigencyTable
+                .filter(item => item.q1 === q1)
+                .map(item => item.count);
+
+            const total = row.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+            return {
+                q1,
+                total
+            };
+        });
+
+        // total for each column
+        const totalColumns = question2options.map(q2 => {
+            const row = contigencyTable
+                .filter(item => item.q2 === q2)
+                .map(item => item.count);
+
+            const total = row.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+            return {
+                q2,
+                total
+            };
+        });
+
+        // grand total
+        const grandTotal = [...totalColumns, ...totalRows].reduce((accumulator, currentValue) => accumulator + currentValue.total, 0);
+
+
+        // expected frequency table
+        const expectedFrequencyTable = totalRows.flatMap(row => {
+            return totalColumns.map(column => {
+                
+                const frequency = row.total * column.total / grandTotal;
+                
+                return {
+                    q1: row.q1,
+                    q2: column.q2,
+                    frequency,
+                }
+            })
+        });
+
+        // chi square table
+        const chiSquareTable = contigencyTable.map((data, index) => {
+            return (((data.count - expectedFrequencyTable[index].frequency) ** 2) / expectedFrequencyTable[index].frequency) || 0
+        });
+
+        // chi squared statistics
+        const chiSquaredStatistics = chiSquareTable.reduce((a, b) => a + b, 0).toFixed(2);
+
+        // const degree of freedom
+        // const df = (totalRows.length - 1) * (totalColumns.length - 1);
+
+        // significance level
+        const sl = 0.05;
+
+        // critical value
+        const criticalValue = 16.92;
+
+        const hypothesis = chiSquaredStatistics > criticalValue;
+
+        return {
+            contigencyTable,
+            expectedFrequencyTable,
+            chiSquaredStatistics,
+            criticalValue,
+            summary: hypothesis ? 
+                `H0: There is association between the two questions because the Chi-Squared Statistic (${chiSquaredStatistics}) is greater than the Critical Value (${criticalValue})at a significance level of ${sl}.` : 
+                `H1: There is no association between the two questions because the Chi-Squared Statistic (${chiSquaredStatistics}) is less than the Critical Value (${criticalValue}) at a significance level of ${sl}.`,
+        }
+    }
+
+
+    // chiSquareTest(surveyQuestions[1].id, surveyQuestions[6].id);
+
+    // get s=chart data
     const getQuestionChartData = (questionId, chartType) => {
-        const labels = surveyQuestions.find(question => question.id === questionId).options.map(option => option.text);
+        const labels = surveyQuestions.find(question => question.id === questionId).options.map(option => option.value);
 
         // get all data
         const getAllData = surveys.flatMap(survey => {
@@ -178,7 +267,7 @@ const Analytics = ({navigation, route}) => {
 
         // get all data
         const data = labels.map(label => {
-            const count = questionSurveys.filter(item => item.answer.text === label).length;
+            const count = questionSurveys.filter(item => item.answer.value === label).length;
             return count;
         });
 
@@ -187,7 +276,7 @@ const Analytics = ({navigation, route}) => {
                 name: label,
                 value: data[index],
                 color: colors.pieChart[index],
-                legendFontSize: 15,
+                legendFontSize: 17,
                 legendFontSColor: colors.neutral,
             }
         })
@@ -205,28 +294,48 @@ const Analytics = ({navigation, route}) => {
 
     // get average of data
     const getQuestionAverage = (questionId, averageType) => {
-        const labels = surveyQuestions.find(question => question.id === questionId).options.map(option => option.text);
 
         // get all data
         const getAllData = surveys.flatMap(survey => {
             return survey.data
         });
 
+        
         // get all answers for target question
         const questionSurveys = getAllData.filter(item => item.questionId === questionId);
+    
+        // data 
+        const surveyValues = questionSurveys.map(survey => survey.answer.value);
 
-        // get all data
-        const data = labels.map(label => {
-            const count = questionSurveys.filter(item => item.answer.text === label).length;
-            return count;
-        });
+        const getMode = (numbers) => {
+            const counts = {};
+            let maxCount = 0;
+            let mode;
+          
+            for (let i = 0; i < numbers.length; i++) {
+              const num = numbers[i];
+              counts[num] = (counts[num] || 0) + 1;
+              if (counts[num] > maxCount) {
+                maxCount = counts[num];
+                mode = num;
+              }
+            }
+          
+            const modes = Object.keys(counts).filter(num => counts[num] === maxCount);
+            if (modes.length > 1) {
+              const sum = modes.reduce((total, num) => total + parseInt(num), 0);
+              mode = sum / modes.length;
+            }
+          
+            return mode;
+        }
 
         // evaluate mean
-        const mean = data.reduce((a, b) => a + b, 0) / data.length;
+        const mean = surveyValues.reduce((a, b) => a + b, 0) / surveyValues.length;
         // evaluate mode
-        const mode = Math.max(...data);
+        const mode = getMode(surveyValues);
         // evluate median
-        const sortedData = data.sort((a, b) => a - b);
+        const sortedData = surveyValues.sort((a, b) => a - b);
         const middleIndex = Math.floor(sortedData.length / 2);
         const median = sortedData.length % 2 === 0 ? 
             (sortedData[middleIndex - 1] + sortedData[middleIndex]) / 2 :
@@ -239,17 +348,15 @@ const Analytics = ({navigation, route}) => {
         if (averageType === 'median') return median;
 
         // evaluate standard deviation
-        const deviation = data.map(value => {
+        const deviation = surveyValues.map(value => {
             return Math.pow(value - mean, 2);
         });
 
-        const standardDeviation = Math.sqrt(deviation.reduce((a, b) => a + b, 0) / data.length);
+        const standardDeviation = Math.sqrt(deviation.reduce((a, b) => a + b, 0) / surveyValues.length);
         // round answer o 2 dp
 
         return standardDeviation.toPrecision(3);
     }
-
-    console.log(selected_product.id)
 
     // chart configuration
     const chartConfig = {
@@ -307,6 +414,8 @@ const Analytics = ({navigation, route}) => {
         fetchSurveys().catch(error => console.log(error));
     }, []);
 
+    console.log(questionNumber);
+
     return (<>
 		{/* mai page content */}
 		<ScrollView 
@@ -329,10 +438,94 @@ const Analytics = ({navigation, route}) => {
                     {selected_product.product_name}
                 </Text>
             </View>
-            {surveyQuestions.map((surveyQuestion, index) => (
+            <Text style={styles.statisticsHeading}>
+                Chi-Square Test for Association
+            </Text>
+            <Shadow 
+                style={styles.optionsWrapper}
+                distance={40}
+                offset={[0, 40]}
+                startColor='#00000008'
+            >
+                <TouchableOpacity
+                    style={styles.selectQuestionButton}
+                    onPress={() => openModal(1)}
+                >
+                    <Text style={styles.questionLabel}>
+                        Question 1
+                    </Text>
+                    <View style={styles.questionWrapper}>
+                        <Text style={styles.selectQuestionButtonText}>
+                            {question1.question}
+                        </Text>
+                        <View style={styles.dropDownArrow}>
+                            <BackArrowIcon />
+                        </View>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.selectQuestionButton}
+                    onPress={() => openModal(2)}
+                >
+                    <Text style={styles.questionLabel}>
+                        Question 2
+                    </Text>
+                    <View style={styles.questionWrapper}>
+                        <Text style={styles.selectQuestionButtonText}>
+                            {question2.question}
+                        </Text>
+                        <View style={styles.dropDownArrow}>
+                            <BackArrowIcon />
+                        </View>
+                    </View>
+                </TouchableOpacity>
+                <View>
+                    <Text style={styles.question}>Question 1 Options</Text>
+                    {question1.options.map(option => (
+                        <Text key={option.value} style={styles.chiTextResults}>
+                            {option.text}
+                        </Text>
+                    ))}
+                </View>
+                <View>
+                    <Text style={styles.question}>Question 2 Options</Text>
+                    {question2.options.map(option => (
+                        <Text key={option.value} style={styles.chiTextResults}>
+                            {option.text}
+                        </Text>
+                    ))}
+                </View>
+                <View>
+                    <Text style={styles.question}>Contigency Table</Text>
+                    {chiSquareTest(question1.id, question2.id).contigencyTable.map(data => (
+                        <Text key={data.q1 + data.q2} style={styles.chiTextResults}>
+                            {`${data.q1}, ${data.q2} - ${data.count}`}
+                        </Text>
+                    ))}
+                </View>
+                <View>
+                    <Text style={styles.question}>Chi-Squared Result</Text>
+                    <Text style={styles.chiTextResults}>
+                        Chi-Squared Statistics - {chiSquareTest(question1.id, question2.id).chiSquaredStatistics}
+                    </Text>
+                    <Text style={styles.chiTextResults}>
+                        Critical Value - {chiSquareTest(question1.id, question2.id).criticalValue}
+                    </Text>
+                    <Text style={styles.chiTextResults}>
+                        {chiSquareTest(question1.id, question2.id).summary}
+                    </Text>
+                </View>
+            </Shadow>
+
+            {/* survey results */}
+            <Text style={[styles.statisticsHeading, {marginBottom: -15}]}>
+                Survey Statistics
+            </Text>
+            {/* survey results */}
+            {surveys.length !== 0 && surveyQuestions.map((surveyQuestion, index) => (
                 <View key={surveyQuestion.id} style={styles.questionGroup}>
                     <Text style={styles.question}>
-                        {surveyQuestion.question}
+                        {`${surveyQuestion.serial_number}) ${surveyQuestion.question}`}
                     </Text>
                     <Shadow 
                         style={styles.optionsWrapper}
@@ -340,7 +533,7 @@ const Analytics = ({navigation, route}) => {
                         offset={[0, 40]}
                         startColor='#00000008'
                     >
-                        {(index === 0 || index === surveyQuestions.length - 1) ? (
+                        {([0, 2, 9].includes(index)) ? (
                             <BarChart
                                 style={styles.graphStyle}
                                 data={getQuestionChartData(surveyQuestion.id, 'BarChart')}
@@ -365,8 +558,17 @@ const Analytics = ({navigation, route}) => {
                                 backgroundColor={colors.white}
                                 paddingLeft='15'
                                 center={[40, 0]}
+                                
                             />
                         )}
+                        <View style={styles.keyWrapper}>
+                            <Text style={styles.keyHeading}>Keys</Text>
+                            {surveyQuestion.options.map(option => (
+                                <Text key={option.value} style={styles.keyText}>
+                                    {`${option.value} - ${option.text}`}
+                                </Text>
+                            ))}
+                        </View>
                         <View style={styles.averages}>
                             <Shadow 
                                 style={styles.average}
@@ -424,7 +626,92 @@ const Analytics = ({navigation, route}) => {
                     </Shadow>
                 </View>
             ))}
+
+            {/* survey participants */}
+            {surveys.length !== 0 && (
+                <Shadow 
+                    style={[styles.optionsWrapper, styles.surveyParticipantsContainer]}
+                    distance={40}
+                    offset={[0, 40]}
+                    startColor='#00000008'
+                >
+                    <Text style={styles.surveyParticpantsHeading}>
+                        Survey Participants
+                    </Text>
+                    <View style={styles.participantWrapper}>
+                        {participants.map((participant, index) => (
+                            <View key={index} style={styles.surveyParticipant}>
+                                <Image
+                                    style={styles.surveyParticipantImage}
+                                    source={require('../assets/images/user.png')}
+                                />
+                                <View style={styles.participantOnformation}>
+                                    <Text style={styles.participantName}>{participant.full_name}</Text>
+                                    <Text style={styles.participantEmail}>{participant.email}</Text>
+                                </View>
+                            </View>
+                        ))}
+                    </View>
+                </Shadow>
+            )}
+            
+            {surveys.length === 0 && (
+                <Text style={styles.noSurveysText}>
+                    No Surveys Found
+                </Text>
+            )}
 		</ScrollView>
+        {/* bottom sheet*/}
+        <BottomSheetModal
+            ref={bottomSheetScreenRef}
+            index={0}
+            snapPoints={["50%", "75%", "100%"]}
+            enablePanDownToClose={true}
+            backgroundStyle={styles.backgroundStyle}
+            // over other bottomsheet
+            stackBehavior={"replace"}
+            backdropComponent={renderBackdrop}
+            onChange={(index) => handleOpenSheetStates(index)}
+            handleComponent={() => (
+                <ModalHandle />
+            )}
+        >
+            <View style={styles.sheetTitle}>
+                <TouchableOpacity 
+                    style={styles.closeButtonWrapper} 
+                    onPress={closeModal}
+                >
+                    <CloseIcon />
+                </TouchableOpacity>
+                <View style={styles.titleWrapper}>
+                    <Text style={styles.sheetTitleText}>
+                        Select Question
+                    </Text>
+                </View>
+            </View>
+            <View 
+                style={styles.modalWrapper}
+            >
+                {/* selection for question number 1 */}
+                {questionNumber === 1 ? surveyQuestions.filter(question => question.id !== question1.id).map(question => (
+                    <TouchableOpacity
+                        style={styles.listItem}
+                        key={question.id}
+                        onPress={() => handleSelectQuestion(question.id)}
+                    >
+                        <Text style={styles.listItemText}>{question.question}</Text>
+                    </TouchableOpacity>
+                )) : surveyQuestions.filter(question => question.id !== question2.id).map(question => (
+                    <TouchableOpacity
+                        style={styles.listItem}
+                        key={question.id}
+                        onPress={() => handleSelectQuestion(question.id)}
+                    >
+                        <Text style={styles.listItemText}>{question.question}</Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+        </BottomSheetModal>
 	</>);
 }
 
@@ -467,8 +754,60 @@ const styles = StyleSheet.create({
 		lineHeight: 46,
 		color: colors.black,
 	},
+    statisticsHeading: {
+        marginTop: 42,
+        marginBottom: 20,
+		fontSize: 20,
+		lineHeight: 22,
+		fontFamily: 'sf-pro-text-semibold',
+		color: colors.black,
+    },
+    selectQuestionButton: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        flexDirection: 'column',
+        width: '100%',
+        gap: 8,
+        marginBottom: 20,
+    },
+    questionLabel: {
+        fontSize: 12,
+        lineHeight: 14,
+        fontFamily: 'sf-pro-text-regular',
+        color: colors.black,
+        opacity: 0.7,
+        width: '100%',
+    },
+    questionWrapper: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        flexDirection: 'row',
+        width: '100%',
+        gap: 10,
+    },
+    selectQuestionButtonText: {
+        width: windowWidth - 134,
+        fontSize: 16,
+		lineHeight: 20,
+		fontFamily: 'sf-pro-rounded-regular',
+        color: colors.black,
+    },
+    dropDownArrow: {
+        // rotate 90deg
+        transform: [{rotate: '-90deg'}],
+    },
+    chiTextResults: {
+        fontSize: 14,
+        lineHeight: 20,
+        fontFamily: 'sf-pro-text-regular',
+        color: colors.black,
+        opacity: 0.7,
+        marginTop: 8,
+    },
 	questionGroup: {
-		marginTop: 42,
+        marginTop: 30,
 		display: 'flex',
 		justifyContent: 'flex-start',
 		alignItems: 'flex-start',
@@ -560,10 +899,11 @@ const styles = StyleSheet.create({
     },
 	modalWrapper: {
 		display: 'flex',
-		justifyContent: 'space-between',
+		justifyContent: 'flex-start',
 		alignItems: 'center',
 		flexDirection: 'column',
 		padding: 30,
+        gap: 20,
 		height: '100%',
 	},
 	modalContent: {
@@ -608,5 +948,111 @@ const styles = StyleSheet.create({
         fontFamily: 'sf-pro-rounded-bold',
         fontSize: 25,
         color: colors.black,
+    },
+    keyHeading: {
+		fontSize: 17,
+		lineHeight: 20,
+		fontFamily: 'sf-pro-rounded-semibold',
+		color: colors.black,
+	},
+    keyText: {
+        fontSize: 14,
+		lineHeight: 20,
+		fontFamily: 'sf-pro-text-regular',
+		color: colors.black,
+        opacity: 0.7,
+	},
+    surveyParticipantsContainer: {
+        marginTop: 30,
+    },
+    surveyParticpantsHeading: {
+        fontSize: 17,
+        lineHeight: 20,
+        fontFamily: 'sf-pro-rounded-semibold',
+        color: colors.black,
+	},
+    participantWrapper: {
+        display: 'flex',
+        gap: 20,
+    },
+    surveyParticipant: {
+        width:'100%',
+        height: 50,
+        display:'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        flexDirection: 'row',
+        gap: 15,
+    },
+    surveyParticipantImage: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+    },
+    participantName: {
+        fontSize: 14,
+        lineHeight: 16,
+        fontFamily: 'sf-pro-rounded-semibold',
+        color: colors.black,
+    },
+    participantEmail: {
+        fontSize: 14,
+        lineHeight: 16,
+        fontFamily: 'sf-pro-rounded-regular',
+        color: colors.black,
+        opacity: 0.7,
+        marginTop: 8,
+    },
+    noSurveysText: {
+        marginVertical: 30,
+        fontSize: 17,
+        lineHeight: 20,
+        fontFamily: 'sf-pro-rounded-regular',
+        color: colors.black,
+    },
+    
+    // bottom sheet styles
+    backgroundStyle: {
+        borderRadius: 24,
+        backgroundColor: colors.white,
+    },
+    sheetTitle: {
+        width: "100%",
+        minHeight: 20,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+    },
+    sheetTitleText: {
+        fontFamily: 'sf-pro-rounded-bold',
+        fontSize: 16,
+        position: "relative",
+        color: colors.black,
+    },
+    titleWrapper: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    closeButtonWrapper: {
+        width: 20,
+        height: 20,
+        position: "absolute",
+        right: 20,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    listItem: {
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        height: 40,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+        // backgroundColor: 'red',
     }
 })
