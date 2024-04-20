@@ -43,48 +43,36 @@
 		}
 	];
 
-	// products id
-	const productsId =  [
-		"Parj8XKJYpKRsKyjPUiy",
-		"kf9vkQFKkxgn7fi4znCo",
-		"YApinBmg1L7q9JxurH4r",
-		"vOKWweJwpxCnwNce4Zcx",
-		"vfWzU0fEfh3xNLbYJINF",
-		"bLDn9ulMCR7ARDcINkj1",
-		"z9aydjsmRuGytwNRdpKL",
-		"oMntOfFhkhQkNdpKquUj",
-		"hjzmB9jy722p4jDNobJA",
-		"59LJEND5Af1WggdASPpw",
-		"PcqlYgHgWZsrdh9EhXGZ",
-		"BAPda2kJ8jbVTOi8hYwb",
-		"bKsZcAsnuyOzNfdNmll7",
-		"1vwqievT39VdnHEBoWgP",
-		"vE4gXyQ5IVSE93cPyIgH",
-		"Myp6hzcOrRhjwtBcUsDb",
-		"CMVlzdqhapqiFsu9Cyzu",
-		"5JY7Gcv47ZMpGbdQkXUW",
-		"uNG7yks5UryxHsipuJc6",
-		"72LjrYxNDDFFXg9LXuH8",
-		"F59DQrOArQmV5hHnYeuj",
-		"rumet00Mg7IIAEjTEGY3", 
-		"u9aw0BBF0DvgUUOJ3WwV",
-		"7ZhV3QEtXLW84vZfJpwR",
-		"42yCZN8ycMNXVqNro600",
-		"9qZM3pvpTpMAmb2MScFm",
-		"Up4Ma80wZDZAJOyJoZUh",
-		"f1RgU4L1QmcqXC2Ctm1t",
-		"TGNz4YIFlfQrVYXo9xzM",
-		"CB1bvBdzTKnLTmefoD3h",
-		"bhCFqYxenp3w1NTV6Nyj",
-		"MHsoO1GtMSvkNKrMOvqh",
-		"0TfowIGtyHqC8HmhlGFI",
-		"vcBSjWxAsLVqQo6e7KDd",
-		"l8NP70uhhxSnc3i5ojij",
-		"fxerngFRPbA3CJyIoqNx",
-		"f9zx0s3qCGee7Z7ktGV1",
-		"CCx1hm661McK3boyK5OJ",
-		"6nxkuGCVcaM3mnCqoqzW",
-		"e3CULC0lvBpGjrJvB0K8"
+	const prouctList = [
+		{"id": "5n5yLG7G6kPL0hwbGLMo", "name": "Acrofresh"},
+		{"id": "fBU97MyhjxUTrJYoMJiI", "name": "African Baby Care"},
+		{"id": "Parj8XKJYpKRsKyjPUiy", "name": "Arashi No Umi"},
+		{"id": "kf9vkQFKkxgn7fi4znCo", "name": "Beauty Works 10-in-1 Spray"},
+		{"id": "YApinBmg1L7q9JxurH4r", "name": "Beauty of Joeseon"},
+		{"id": "vOKWweJwpxCnwNce4Zcx", "name": "Billie Eilish Eilish"},
+		{"id": "vfWzU0fEfh3xNLbYJINF", "name": "Bubble Moisturizer"},
+		{"id": "bLDn9ulMCR7ARDcINkj1", "name": "Chamomile Cleansing Balm"},
+		{"id": "z9aydjsmRuGytwNRdpKL", "name": "Curve Case Light"},
+		{"id": "oMntOfFhkhQkNdpKquUj", "name": "Dipbrow Pomade"},
+		{"id": "hjzmB9jy722p4jDNobJA", "name": "Dove Deep Moisture Body Wash"},
+		{"id": "BAPda2kJ8jbVTOi8hYwb", "name": "Eye Shadow Palette Vault"},
+		{"id": "vE4gXyQ5IVSE93cPyIgH", "name": "Floral Street Wonderland Peony"},
+		{"id": "Myp6hzcOrRhjwtBcUsDb", "name": "Gillete Women's Shave Gel"},
+		{"id": "CMVlzdqhapqiFsu9Cyzu", "name": "Gleem Electric Toothbrush"},
+		{"id": "5JY7Gcv47ZMpGbdQkXUW", "name": "Glow Hub Facial Serum"},
+		{"id": "F59DQrOArQmV5hHnYeuj", "name": "Hairtamin"},
+		{"id": "rumet00Mg7IIAEjTEGY3", "name": "Laneige Sleeping Mask"},
+		{"id": "u9aw0BBF0DvgUUOJ3WwV", "name": "Listerine Anticavity Mouthwash"},
+		{"id": "7ZhV3QEtXLW84vZfJpwR", "name": "Micro Sketch Brow Pencil"},
+		{"id": "42yCZN8ycMNXVqNro600", "name": "Mielle Organics Rosemary Mint Growth Oil Trio"},
+		{"id": "9qZM3pvpTpMAmb2MScFm", "name": "Miracle Smile Water Flosser"},
+		{"id": "Up4Ma80wZDZAJOyJoZUh", "name": "Nude 42 Palette Duo"},
+		{"id": "f1RgU4L1QmcqXC2Ctm1t", "name": "Olaplex Daily Essential Duo"},
+		{"id": "CB1bvBdzTKnLTmefoD3h", "name": "Oral B Cool Mint Dental Floss"},
+		{"id": "bhCFqYxenp3w1NTV6Nyj", "name": "Peter Thomas Roth"},
+		{"id": "fxerngFRPbA3CJyIoqNx", "name": "Sol De Janeiro"},
+		{"id": "f9zx0s3qCGee7Z7ktGV1", "name": "Sol Leave In Condiioner"},
+		{"id": "e3CULC0lvBpGjrJvB0K8", "name": "Widly Me"}
 	];
 
 	const generateRandomAnswers = () => {
@@ -147,3 +135,89 @@
 		// 	})
 		// }, 3000);
 	}, []);
+
+	
+	// products id
+	const products = [
+		{"id": "fBU97MyhjxUTrJYoMJiI", "name": "African Baby Care"},
+		{"id": "Parj8XKJYpKRsKyjPUiy", "name": "Arashi No Umi"},
+		{"id": "kf9vkQFKkxgn7fi4znCo", "name": "Beauty Works 10-in-1 Spray"},
+		{"id": "YApinBmg1L7q9JxurH4r", "name": "Beauty of Joeseon"},
+		{"id": "vOKWweJwpxCnwNce4Zcx", "name": "Billie Eilish Eilish"},
+		{"id": "vfWzU0fEfh3xNLbYJINF", "name": "Bubble Moisturizer"},
+		{"id": "bLDn9ulMCR7ARDcINkj1", "name": "Chamomile Cleansing Balm"},
+		{"id": "z9aydjsmRuGytwNRdpKL", "name": "Curve Case Light"},
+		{"id": "oMntOfFhkhQkNdpKquUj", "name": "Dipbrow Pomade"},
+		{"id": "hjzmB9jy722p4jDNobJA", "name": "Dove Deep Moisture Body Wash"},
+		{"id": "BAPda2kJ8jbVTOi8hYwb", "name": "Eye Shadow Palette Vault"},
+		{"id": "vE4gXyQ5IVSE93cPyIgH", "name": "Floral Street Wonderland Peony"},
+		{"id": "Myp6hzcOrRhjwtBcUsDb", "name": "Gillete Women's Shave Gel"},
+		{"id": "CMVlzdqhapqiFsu9Cyzu", "name": "Gleem Electric Toothbrush"},
+		{"id": "5JY7Gcv47ZMpGbdQkXUW", "name": "Glow Hub Facial Serum"},
+		{"id": "F59DQrOArQmV5hHnYeuj", "name": "Hairtamin"},
+		{"id": "rumet00Mg7IIAEjTEGY3", "name": "Laneige Sleeping Mask"},
+		{"id": "u9aw0BBF0DvgUUOJ3WwV", "name": "Listerine Anticavity Mouthwash"},
+		{"id": "7ZhV3QEtXLW84vZfJpwR", "name": "Micro Sketch Brow Pencil"},
+		{"id": "42yCZN8ycMNXVqNro600", "name": "Mielle Organics Rosemary Mint Growth Oil Trio"},
+		{"id": "9qZM3pvpTpMAmb2MScFm", "name": "Miracle Smile Water Flosser"},
+		{"id": "Up4Ma80wZDZAJOyJoZUh", "name": "Nude 42 Palette Duo"},
+		{"id": "f1RgU4L1QmcqXC2Ctm1t", "name": "Olaplex Daily Essential Duo"},
+		{"id": "CB1bvBdzTKnLTmefoD3h", "name": "Oral B Cool Mint Dental Floss"},
+		{"id": "bhCFqYxenp3w1NTV6Nyj", "name": "Peter Thomas Roth"},
+		{"id": "fxerngFRPbA3CJyIoqNx", "name": "Sol De Janeiro"},
+		{"id": "f9zx0s3qCGee7Z7ktGV1", "name": "Sol Leave In Condiioner"},
+		{"id": "e3CULC0lvBpGjrJvB0K8", "name": "Widly Me"}
+	];
+
+	const [uploadCount, setUploadCount] = useState(1);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setUploadCount(prevCount => prevCount + 1);
+		}, 5000);
+	
+		return () => {
+			clearInterval(interval);
+		};
+
+	}, []);
+
+	useEffect(() => {
+		// funtion to send data to db
+		const submitSurvey = async () => {
+			try {
+				setIsLoading(true);
+				// upload data to surveys collection
+				const surveysRef = collection(database, "surveys");
+
+				const randomUser = users[Math.floor(Math.random() * users.length)];
+
+				const randomProduct = products[Math.floor(Math.random() * products.length)];
+
+				await addDoc(surveysRef, {
+					full_name: randomUser.full_name,
+					email: randomUser.email,
+					product_id: randomProduct.id,
+					product_name: randomProduct.name,
+					data: generateRandomAnswers(),
+					created_at: serverTimestamp(),
+					edited_at: serverTimestamp(),
+				})
+
+				console.log('data inserted successfully');
+				// open success modal
+				// openModal();
+				
+			} catch (error) {
+				console.log("error uploading survey", error.message);
+			} finally {
+				// disable button loading state
+				setIsLoading(false);
+			}
+		}
+
+		submitSurvey()
+
+	}, [uploadCount]);
+
+	console.log(uploadCount);

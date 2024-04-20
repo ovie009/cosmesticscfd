@@ -141,9 +141,6 @@ const Dashboard = ({navigation}) => {
 
     const [pageLoading, setPageLoading] = useState(true);
 
-    console.log(surveys[0]);
-    console.log(products[0]);
-
     // tabs for cosmetics categories
     const [tabs, setTabs] = useState([
         {title: 'Skincare', active: true},
@@ -246,6 +243,7 @@ const Dashboard = ({navigation}) => {
             } catch (error) {
                 console.log(error);
             } finally {
+                setPageLoading(false);
             }
         }
 

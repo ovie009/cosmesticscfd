@@ -93,6 +93,8 @@ const Home = ({navigation}) => {
         return []
     }, [tabs, products])
 
+    const [surveyQuestions, setSurveyQuestions] = useState([]);
+
     useEffect(() => {
         // fetch producs from database
         const fetchProducts = async () => {
@@ -112,9 +114,40 @@ const Home = ({navigation}) => {
             }
         }
 
+        // fetch producs from database
+        const fetchQuestions = async () => {
+            try {
+                const productsRef = collection(database, "survey_questions");
+                const q = query(productsRef, orderBy("serial_number"));
+                const querySnapshot = await getDocs(q);
+                const products = [];
+                querySnapshot.forEach((doc) => {
+                    products.push({...doc.data(), id: doc.id});
+                });
+                setSurveyQuestions(products);
+            } catch (error) {
+                console.log(error);
+            } 
+        }
+
+        fetchQuestions();
+
         fetchProducts();
 
-    }, []);
+    }, [tabs]);
+
+	// console.log("HOME QUESTIONS", surveyQuestions[0]);
+
+    const productsId = useMemo(() => {
+        return products.map(product => {
+            return {
+                id: product.id,
+                name: product.product_name
+            }
+        });
+    }, [products]);
+
+    console.log(productsId);
 
     // handle seected tab
     const handleSelectedTab = (tabSelected) => {
@@ -283,6 +316,7 @@ const Home = ({navigation}) => {
                             product_name: product.product_name,
                             product_price: product.price, 
                             product_image: product.product_image, 
+                            survey_questions: surveyQuestions,
                         })}
                     >
                         <Shadow 

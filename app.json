@@ -21,10 +21,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/app/icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.iffieovie.cosmeticsqfd"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/app/icon.png"
     },
     "plugins": [
       "expo-font"

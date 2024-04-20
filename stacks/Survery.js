@@ -19,10 +19,16 @@ import {
     addDoc,
     collection,
     serverTimestamp,
+	getDocs,
+	query,
+	orderBy,
 } from "firebase/firestore";
 
 // bottomsheet componens
 import { BottomSheetModal, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+
+// skeleton screen
+import SurveySkeleton from '../skeleton/SurveySkeleton';
 
 // window width
 const windowWidth = Dimensions.get("window").width;
@@ -30,116 +36,149 @@ const windowWidth = Dimensions.get("window").width;
 const Survey = ({navigation, route}) => {
 
 	// destruct route paramters
-	const {product_id, product_name, product_price, product_image} = useMemo(() => {
+	const {product_id, product_name, product_price, product_image, survey_questions} = useMemo(() => {
 		return route?.params || {}
 	}, [route?.params]);
 	
 	// survey questions
-	const [surveyQuestions, setSurveyQuestions] = useState([
-		{
-			id: 'qRzwquEGnJB503WnpIK9',
-			question: 'Have you used this product before?',
-			options: [
-				{text: 'Yes', value: 1},
-				{text: 'No', value: 0},
-			],
+	const [surveyQuestions, setSurveyQuestions] = useState(survey_questions.map(surveyQuestion => {
+		return {
+			...surveyQuestion,
 			answer: null,
+		}
+	}));
+
+	const [pageLoading, setPageLoading] = useState(survey_questions.length === 0);
+
+	// console.log("SURVEY QUESTIONS", survey_questions[0]);
+
+	useEffect(() => {
+        // fetch producs from database
+        const fetchQuestions = async () => {
+            try {
+                const productsRef = collection(database, "survey_questions");
+                const q = query(productsRef, orderBy("serial_number"));
+                const querySnapshot = await getDocs(q);
+                const products = [];
+                querySnapshot.forEach((doc) => {
+                    products.push({...doc.data(), id: doc.id});
+                });
+				setSurveyQuestions(products.map(product => {
+					return {
+						...product,
+						answer: null,
+					}
+				}));
+            } catch (error) {
+                console.log(error);
+            } finally {
+				setPageLoading(false)
+			}
+        }
+
+        fetchQuestions();
+
+    }, []);
+
+	// users
+	const users = [
+		{
+			"full_name": "Michael Smith",
+			"email": "michael.smith@gmail.com"
 		},
 		{
-			id: 'yqkgJiwS6Gz4pzEOqH8P',
-			question: 'What factors influence your decision to purchase this product?',
-			options: [
-				{text: 'Price', value: 1},
-				{text: 'Ingredients', value: 2},
-				{text: 'Brand Reputation', value: 3},
-				{text: 'Products Reviews', value: 4},
-			],
-			answer: null,
+			"full_name": "David Johnson",
+			"email": "david.johnson@gmail.com"
 		},
 		{
-			id: 'slWnymirA3Z4VQEHj3BI',
-			question: 'How often are you likely to buy this product?',
-			options: [
-				{text: 'Weekly', value: 1},
-				{text: 'Monthly', value: 2},
-				{text: 'Bi-Monthly', value: 3},
-				{text: 'Occassionally', value: 4},
-			],
-			answer: null,
+			"full_name": "John Williams",
+			"email": "john.williams@gmail.com"
 		},
 		{
-			id: 't3PUQ5Z5YGpjU3Iv29rc',
-			question: 'What specific skin concerns or needs do you look to address?',
-			options: [
-				{text: 'Dryness', value: 1},
-				{text: 'Sensitivity', value: 2},
-				{text: 'Aging', value: 3},
-				{text: 'Uneven Skin Tone', value: 4},
-			],
-			answer: null,
+			"full_name": "Matthew Brown",
+			"email": "matthew.brown@gmail.com"
 		},
 		{
-			id: 'ZTlzJyeWQtWIh6DBFxCr',
-			question: 'Would you recommend this product to your family or friends?',
-			options: [
-				{text: 'Strongly Agree', value: 1},
-				{text: 'Agree', value: 2},
-				{text: 'Disagree', value: 3},
-				{text: 'Strongly Disagree', value: 4},
-			],
-			answer: null,
+			"full_name": "Daniel Davies",
+			"email": "daniel.davies@gmail.com"
 		},
 		{
-			id: 'V1jPI3OtJR72mekbHGFJ',
-			question: 'How satisfied are you with this product?',
-			options: [
-				{text: 'Very Satisfied', value: 1},
-				{text: 'Somewhat Satisfied', value: 2},
-				{text: 'Neutral', value: 3},
-				{text: 'Dissatisfied', value: 4},
-			],
-			answer: null,
+			"full_name": "Emily Taylor",
+			"email": "emily.taylor@gmail.com"
 		},
 		{
-			id: 'D2pLIevZ2MjDqoCXKwFb',
-			question: 'Are you willing to pay more for similar products with more organic or natural ingredients?',
-			options: [
-				{text: 'Yes, significantly more', value: 1},
-				{text: 'Yes, slightly more', value: 2},
-				{text: 'No, not willing to pay more', value: 3},
-				{text: 'No preference', value: 4},
-			],
-			answer: null,
+			"full_name": "Sarah Martinez",
+			"email": "sarah.martinez@gmail.com"
 		},
 		{
-			id: 'rkENGpEIY8OjfuZjHp6H',
-			question: 'Have you ever switched brands or tried a new product? If so, what motivated this change?',
-			options: [
-				{text: 'Price', value: 1},
-				{text: 'Ingredient Preference', value: 2},
-				{text: 'Recommendation from friend/family', value: 3},
-				{text: 'Advertisement/marketing campaign', value: 4},
-			],
-			answer: null,
+			"full_name": "Jessica Anderson",
+			"email": "jessica.anderson@gmail.com"
 		},
 		{
-			id: 'HE8ksoiocQPl32WL5sno',
-			question: 'Do you think the price of this product is worth the quality of the product?',
-			options: [
-				{text: 'Strongly Agree', value: 1},
-				{text: 'Agree', value: 2},
-				{text: 'Maybe', value: 3},
-				{text: 'Never', value: 4},
-			],
-			answer: null,
+			"full_name": "Rachel Garcia",
+			"email": "rachel.garcia@gmail.com"
 		},
-	]);
+		{
+			"full_name": "Olivia Thomas",
+			"email": "olivia.thomas@gmail.com"
+		}
+	];
+
+	// useEffect(() => {
+	// 	const uploadData = async () => {
+	// 		try {
+	// 			console.log('uploading data...');
+	// 			// ref to products collection
+	// 			const productsRef = collection(database, "survey_questions");
+	
+	// 			surveyQuestions.forEach(async (surveyQuestion) => {
+	// 				try {
+	
+	// 					// check if product name exist, if it does then skip
+	// 					const q = query(productsRef, where("question", "==", surveyQuestion.question));
+	
+	// 					// get docs
+	// 					const querySnapshot = await getDocs(q);
+	
+	// 					if (querySnapshot.size > 0) {
+	// 						console.log("Data", querySnapshot.docs[0].data())
+	// 						console.log("Document already exists");
+	// 						return;
+	// 					}
+	
+	// 					// add doc
+	// 					await addDoc(productsRef, {
+	// 						serial_number: surveyQuestion.id,
+	// 						question: surveyQuestion.question,
+	// 						options: surveyQuestion.options,
+	// 						created_at: serverTimestamp(),
+	// 						edited_at: serverTimestamp(),
+	// 					});
+
+	// 					console.log('data uploaded succesfully');
+	
+	// 				} catch (error) {
+	// 					console.log("Error adding document: ", error.messsage);
+	// 				}
+	// 			})
+	// 		} catch (error) {
+	// 			console.log("Erorr creating collection: ", error.messsage);
+	// 		}
+	// 	}
+
+	// 	uploadData().catch(error => {
+	// 		console.log(error.message)
+	// 	});
+
+	// }, [])
 
 	// question and answer data
+	
 	const data = useMemo(() => {
+		if (surveyQuestions.length === 0) return {};
 		// reduce survey arry to return an array of objects
 		// object should have two fields, quesionId and answers
-		return surveyQuestions.map((surveyQuestion) => {
+		return surveyQuestions?.map((surveyQuestion) => {
 			return {
 				questionId: surveyQuestion.id,
 				answer: surveyQuestion.answer,
@@ -150,56 +189,9 @@ const Survey = ({navigation, route}) => {
 	// is loading state
 	const [isLoading, setIsLoading] = useState(false);
 
-	// console.log(data);
-
-	// useEffect(() => {
-	// 	const uploadData = async () => {
-	// 		try {
-	// 			console.log('uploading data...');
-	// 			// ref to products collection
-	// 			const surveyQuestionsRef = collection(database, "survey_questions");
-
-	// 			surveyQuestions.forEach(async (surveyQuestion) => {
-	// 				try {
-
-	// 					// check if product name exist, if it does then skip
-	// 					const q = query(surveyQuestionsRef, where("question", "==", surveyQuestion.question));
-
-	// 					// get docs
-	// 					const querySnapshot = await getDocs(q);
-
-	// 					if (querySnapshot.size > 0) {
-	// 						// console.log("Data", querySnapshot.docs[0].data())
-	// 						// console.log("Document already exists");
-	// 						return;
-	// 					}
-
-	// 					// add doc
-	// 					await addDoc(surveyQuestionsRef, {
-	// 						question: surveyQuestion.question,
-	// 						options: surveyQuestion.options,
-	// 						created_at: serverTimestamp(),
-	// 						edited_at: serverTimestamp(),
-	// 					});
-
-	// 				} catch (error) {
-	// 					console.log("Error adding document: ", error.messsage);
-	// 					throw error;
-	// 				} 
-	// 			})
-	// 		} catch (error) {
-	// 			console.log("Erorr creating collection: ", error.messsage);
-	// 		} finally {
-	// 			console.log("upload completed");
-	// 		}
-	// 	}
-
-	// 	uploadData().catch(error => console.log(error.message));
-	// });
-
 	const handleSelectedOption = (questionId, answerValue) => {
 		setSurveyQuestions(prevSurveyQuestions => {
-			return prevSurveyQuestions.map(prevSurveyQuestion => {
+			return prevSurveyQuestions?.map(prevSurveyQuestion => {
 				if (questionId === prevSurveyQuestion.id) {
 					return {
 						...prevSurveyQuestion,
@@ -211,6 +203,8 @@ const Survey = ({navigation, route}) => {
 		})
 	}
 
+
+
 	// funtion to send data to db
 	const handleSubmitSurvey = async () => {
 		try {
@@ -219,9 +213,10 @@ const Survey = ({navigation, route}) => {
 			const surveysRef = collection(database, "surveys");
 
 			await addDoc(surveysRef, {
-				full_name: "Okoye Promise",
-				email: "promise4engr@gmail.com",
+				full_name: users[9].full_name,
+				email: users[9].email,
 				product_id: product_id,
+				product_name: product_name,
 				data: data,
 				created_at: serverTimestamp(),
 				edited_at: serverTimestamp(),
@@ -237,6 +232,7 @@ const Survey = ({navigation, route}) => {
 			setIsLoading(false);
 		}
 	}
+
 
 	const handleSurveyCompleted = () => {
 		closeModal();
@@ -282,7 +278,7 @@ const Survey = ({navigation, route}) => {
 	// console.log(generateRandomAnswers());
 	
 
-    return (<>
+    return !pageLoading ? (<>
 		{/* mai page content */}
 		<ScrollView 
 			showsVerticalScrollIndicator={false} 
@@ -304,10 +300,10 @@ const Survey = ({navigation, route}) => {
 						{product_name}
 					</Text>
 				</View>
-				{surveyQuestions.map(surveyQuestion => (
-					<View key={surveyQuestion.id} style={styles.questionGroup}>
+				{surveyQuestions?.map((surveyQuestion, index) => (
+					<View key={surveyQuestion.id + index} style={styles.questionGroup}>
 						<Text style={styles.question}>
-							{surveyQuestion.question}
+							{`${surveyQuestion.serial_number}) ${surveyQuestion.question}`}
 						</Text>
 						<Shadow 
 							style={styles.optionsWrapper}
@@ -315,9 +311,9 @@ const Survey = ({navigation, route}) => {
 							offset={[0, 40]}
 							startColor='#00000008'
 						>
-							{surveyQuestion.options.map((option, index) => (
+							{surveyQuestion?.options?.map((option, index) => (
 								<TouchableOpacity
-									key={option.value}
+									key={index}
 									style={styles.option}
 									onPress={() => handleSelectedOption(surveyQuestion.id, option.value)}
 								>
@@ -380,7 +376,7 @@ const Survey = ({navigation, route}) => {
 				/>
 			</View>
 		</BottomSheetModal>
-	</>);
+	</>) : <SurveySkeleton />;
 }
 
 export default Survey
@@ -475,6 +471,7 @@ const styles = StyleSheet.create({
 	optionText: {
 		flexGrow: 1,
 		height: '100%',
+		width: windowWidth - 151,
 	},
 	listSeperator: {
 		borderBottomWidth: 0.5,

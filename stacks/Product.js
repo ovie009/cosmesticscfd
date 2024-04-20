@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native'
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 // expo image component
 import { Image } from 'expo-image'
 import { colors } from '../styles/colors';
@@ -9,10 +9,23 @@ import { Shadow } from 'react-native-shadow-2';
 import LoveBlackIcon from '../assets/svg/LoveBlackIcon';
 import BackArrowIcon from '../assets/svg/BackArrowIcon';
 
+// firebase
+import {
+    database,
+} from "../Firebase";
+
+// firestore functions
+import {
+    collection,
+    getDocs,
+    query,
+    orderBy,
+} from "firebase/firestore";
+
 const Product = ({navigation, route}) => {
 
     // destruct route paramters
-    const {product_id, product_name, product_price, product_image} = useMemo(() => {
+    const {product_id, product_name, product_price, product_image, survey_questions} = useMemo(() => {
         return route?.params || {}
     }, [route?.params]);
 
@@ -20,6 +33,30 @@ const Product = ({navigation, route}) => {
     const handleLikeProdcut = () => {
         
     }
+
+    const [surveyQuestions, setSurveyQuestions] = useState([survey_questions]);
+	// console.log("PRODUCT QUESTIONS", survey_questions[0]);
+
+    useEffect(() => {
+        // fetch producs from database
+        const fetchQuestions = async () => {
+            try {
+                const productsRef = collection(database, "survey_questions");
+                const q = query(productsRef, orderBy("serial_number"));
+                const querySnapshot = await getDocs(q);
+                const products = [];
+                querySnapshot.forEach((doc) => {
+                    products.push({...doc.data(), id: doc.id});
+                });
+                setSurveyQuestions(products);
+            } catch (error) {
+                console.log(error);
+            } 
+        }
+
+        fetchQuestions();
+
+    }, []);
 
     return (
         <ScrollView 
@@ -77,6 +114,7 @@ const Product = ({navigation, route}) => {
                     onPress={() => navigation.navigate('Survey', {
                         product_id: product_id,
                         product_name: product_name,
+                        survey_questions: surveyQuestions
                     })}
                 >
                     <Text style={styles.actionButtonText}>Take Survey</Text>

@@ -26,10 +26,10 @@ const Login = ({navigation, route}) => {
     const [tab, setTab] = useState(user_signup ? "Signup" : "Login");
 
     // email input
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState("johndoe@gmail.com");
 
     // passowrd input
-    const [password, setPassword] = useState("");
+    const [password, setPassword] = useState("cosmeticsqfd");
 
     // disable button state
     const disabled = !email || !password
@@ -50,7 +50,7 @@ const Login = ({navigation, route}) => {
             );
             
         } catch (error) {
-            
+            console.log(error.message);
         } finally {
             // disable loading state
             setIsLoading(false);

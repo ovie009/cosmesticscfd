@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^4.6.1",
-    "@react-native-async-storage/async-storage": "^1.23.1",
+    "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "expo": "~50.0.14",
@@ -29,7 +29,7 @@
     "react-native-screens": "~3.29.0",
     "react-native-shadow-2": "^7.0.8",
     "react-native-shimmer-placeholder": "^2.0.9",
-    "react-native-svg": "^15.1.0"
+    "react-native-svg": "^14.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
